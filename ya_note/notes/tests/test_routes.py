@@ -63,7 +63,7 @@ class TestRoutes(TestCase):
             self.client.force_login(user)
             # Для каждой пары "пользователь - ожидаемый ответ"
             # перебираем имена тестируемых страниц:
-            for name in ('notes:edit', 'notes:delete'):  
+            for name in ('notes:edit', 'notes:delete'):
                 with self.subTest(user=user, name=name):
                     url = reverse(name, args=(self.note.slug,))
                     print(url)
@@ -76,11 +76,13 @@ class TestRoutes(TestCase):
         # В цикле перебираем имена страниц, с которых ожидаем редирект:
         for name in ('notes:list', 'notes:add', 'notes:success'):
             with self.subTest(name=name):
-                # Получаем адрес страницы редактирования или удаления комментария:
+                # Получаем адрес страницы редактирования
+                # или удаления комментария:
                 url = reverse(name)
-                # Получаем ожидаемый адрес страницы логина, 
+                # Получаем ожидаемый адрес страницы логина,
                 # на который будет перенаправлен пользователь.
-                # Учитываем, что в адресе будет параметр next, в котором передаётся
+                # Учитываем, что в адресе будет параметр next,
+                # в котором передаётся
                 # адрес страницы, с которой пользователь был переадресован.
                 redirect_url = f'{login_url}?next={url}'
                 response = self.client.get(url)
