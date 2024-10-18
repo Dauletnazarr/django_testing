@@ -22,8 +22,8 @@ def test_user_can_create_note(author_client, author, form_data):
     assertRedirects(response, reverse('notes:success'))
     # Считаем общее количество заметок в БД, ожидаем 1 заметку.
     assert Note.objects.count() == 1
-    # Чтобы проверить значения полей заметки -
-    # получаем её из базы при помощи метода get():
+    # Чтобы проверить значения полей заметки
+    # - получаем её из базы при помощи метода get():
     new_note = Note.objects.get()
     # Сверяем атрибуты объекта с ожидаемыми.
     assert new_note.title == form_data['title']
