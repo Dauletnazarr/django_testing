@@ -38,15 +38,6 @@ class TestListPage(TestCase):
     def test_my_notes_only_in_my_list(self):
         self.client.force_login(self.author)
 
-        author_notes = [
-            Note.objects.create(
-                title=f'Заметка {index}',
-                text='Просто текст.',
-                author=self.author,
-                slug=f'author_{self.author.id}_{index}'
-            ) for index in range(5)
-        ]
-
         other_user_notes = [
             Note.objects.create(
                 title=f'Заметка {index}',

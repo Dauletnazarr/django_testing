@@ -18,6 +18,7 @@ def test_news_count(client, multiple_news):
     # print(f'Количество записей в News: {News.objects.count()}')
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
+
 @pytest.mark.django_db
 def test_news_order(client, multiple_news):
     url = reverse('news:home')

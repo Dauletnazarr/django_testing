@@ -24,7 +24,7 @@ from notes.forms import NoteForm
 
 # # В этом тесте тоже используем фикстуру заметки,
 # # но в качестве клиента используем not_author_client;
-# # в этом клиенте авторизован не автор заметки, 
+# # в этом клиенте авторизован не автор заметки,
 # # так что заметка не должна быть ему видна.
 # def test_note_not_in_list_for_another_user(note, not_author_client):
 #     url = reverse('notes:list')
@@ -73,7 +73,8 @@ def test_notes_list_for_different_users(
 #     assert isinstance(response.context['form'], NoteForm)
 
 
-# # В параметры теста передаём фикстуру slug_for_args и клиент с автором заметки:
+# # В параметры теста передаём фикстуру slug_for_args
+# и клиент с автором заметки:
 # def test_edit_note_page_contains_form(slug_for_args, author_client):
 #     url = reverse('notes:edit', args=slug_for_args)
 #     # Запрашиваем страницу редактирования заметки:
@@ -88,7 +89,7 @@ def test_notes_list_for_different_users(
     # В качестве параметров передаём name и args для reverse.
     'name, args',
     (
-        # Для тестирования страницы создания заметки 
+        # Для тестирования страницы создания заметки
         # никакие дополнительные аргументы для reverse() не нужны.
         ('notes:add', None),
         # Для тестирования страницы редактирования заметки нужен slug заметки.

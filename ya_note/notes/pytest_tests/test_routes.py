@@ -6,9 +6,6 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 
-from notes.models import Note
-
-
 # Указываем в фикстурах встроенный клиент.
 def test_home_availability_for_anonymous_user(client):
     # Адрес страницы получаем через reverse():
@@ -80,7 +77,7 @@ def test_pages_availability_for_different_users(
 
 
 # @pytest.mark.parametrize(
-#     # Вторым параметром передаём note_object, 
+#     # Вторым параметром передаём note_object,
 #     # в котором будет либо фикстура с объектом заметки, либо None.
 #     'name, note_object',
 #     (
