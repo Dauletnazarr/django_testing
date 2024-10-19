@@ -5,31 +5,24 @@ from pytest_django.asserts import assertRedirects
 
 from http import HTTPStatus
 
-
-@pytest.mark.django_db
-def test_home_availability_for_anonymous_user(client):
-    # Адрес страницы получаем через reverse():
-    url = reverse('news:home')
-    response = client.get(url)
-    assert response.status_code == HTTPStatus.OK
-
-
-@pytest.mark.django_db
-def test_news_detail_availability_for_anonymous_user(client, news):
-    url = reverse('news:detail', args=(news.id,))
-    response = client.get(url)
-    assert response.status_code == HTTPStatus.OK
+NEWS_DETAIL_URL = 'news:detail'
+NEWS_EDIT_URL = 'news:edit'
+COMMENT_DELETE_URL = 'news:delete'
+USERS_LOGIN_URL = 'users:login'
+USERS_LOGOUT_URL = 'users:logout'
+USERS_SIGNUP_URL = 'users:signup'
+NEWS_HOME_URL = 'news:home'
+pytestmark = pytest.mark.django_db
+lazy_fixture = pytest.lazy_fixture('pk_for_args')
 
 
-@pytest.mark.django_db
+@pytestmark
 @pytest.mark.parametrize('name, args', ((
-    'news:edit', pytest.lazy_fixture('pk_for_args')),
-    ('news:delete', pytest.lazy_fixture('pk_for_args')),),
+    NEWS_EDIT_URL, lazy_fixture),
+    (COMMENT_DELETE_URL, lazy_fixture),),
 )
-# Передаём в тест анонимный клиент, name проверяемых страниц и args:
 def test_redirects(client, name, args):
     login_url = reverse('users:login')
-    # Теперь не надо писать никаких if и можно обойтись одним выражением.
     url = reverse(name, args=args)
     expected_url = f'{login_url}?next={url}'
     response = client.get(url)
@@ -37,22 +30,24 @@ def test_redirects(client, name, args):
 
 
 @pytest.mark.parametrize(
-    'name, args',
-    (
-        ('news:edit', pytest.lazy_fixture('pk_for_args')),
-        ('news:delete', pytest.lazy_fixture('pk_for_args')),
-    ),
+    "client_fixture, url_name, args, expected_status",
+    [
+        ('client', NEWS_DETAIL_URL, lazy_fixture, HTTPStatus.OK),
+        ('not_author_client', NEWS_EDIT_URL, lazy_fixture,
+         HTTPStatus.NOT_FOUND),
+        ('not_author_client', COMMENT_DELETE_URL, lazy_fixture,
+         HTTPStatus.NOT_FOUND),
+        ('client', USERS_LOGIN_URL, None, HTTPStatus.OK),
+        ('client', USERS_LOGOUT_URL, None, HTTPStatus.OK),
+        ('client', USERS_SIGNUP_URL, None, HTTPStatus.OK),
+        ('client', NEWS_HOME_URL, None, HTTPStatus.OK),
+    ]
 )
-def test_not_author_cant_edit_delete_comments(not_author_client, name, args):
-    expected_url = HTTPStatus.NOT_FOUND
-    url = reverse(name, args=args)
-    response = not_author_client.get(url)
-    assert response.status_code == expected_url
+def test_page_availability(
+    client_fixture, url_name, args, expected_status, request
+):
 
-
-@pytest.mark.parametrize('name',
-                         ('users:login', 'users:logout', 'users:signup'))
-def test_pages_availability_for_anonymous(client, name):
-    url = reverse(name)
+    client = request.getfixturevalue(client_fixture)
+    url = reverse(url_name, args=args if args else ())
     response = client.get(url)
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == expected_status
