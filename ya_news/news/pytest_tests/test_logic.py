@@ -1,10 +1,9 @@
-from pytest_django.asserts import assertRedirects, assertFormError
-
-from django.urls import reverse
-
 from http import HTTPStatus
 
 import pytest
+from pytest_django.asserts import assertRedirects, assertFormError
+
+from django.urls import reverse
 
 from news.forms import WARNING
 from news.models import Comment
@@ -47,7 +46,7 @@ def test_user_cant_use_bad_words(
 
 
 def test_author_can_edit_comment(
-        author_client, form_data, news_detail_url, news, comment_edit_url,
+        author_client, form_data, news_detail_url, comment_edit_url,
         comment):
 
     url = comment_edit_url
@@ -58,7 +57,7 @@ def test_author_can_edit_comment(
     updated_comment = Comment.objects.get(id=comment.id)
     assert updated_comment.text == form_data['text']
     assert updated_comment.author == comment.author
-    assert updated_comment.news == news
+    assert updated_comment.news == comment.news
     assert updated_comment.created == comment.created
 
 

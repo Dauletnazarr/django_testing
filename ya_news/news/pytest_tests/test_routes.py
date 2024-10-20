@@ -1,10 +1,10 @@
-import pytest
+from http import HTTPStatus
 
-from django.urls import reverse
+import pytest
 from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture
 
-from http import HTTPStatus
+from django.urls import reverse
 
 NEWS_DETAIL_URL = lazy_fixture('news_detail_url')
 NEWS_EDIT_URL = lazy_fixture('comment_edit_url')

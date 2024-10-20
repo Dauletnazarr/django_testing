@@ -1,14 +1,14 @@
-import pytest
-
 from datetime import datetime, timedelta
+
+import pytest
 
 from django.conf import settings
 from django.test.client import Client
-from django.utils import timezone
 from django.urls import reverse
+from django.utils import timezone
 
-from news.models import News, Comment
 from news.forms import BAD_WORDS
+from news.models import News, Comment
 
 
 @pytest.fixture
@@ -50,11 +50,6 @@ def comment(author, news):
         text='Комментарий',
         author=author,
     )
-
-
-@pytest.fixture
-def pk_for_args(comment):
-    return (comment.id,)
 
 
 @pytest.fixture

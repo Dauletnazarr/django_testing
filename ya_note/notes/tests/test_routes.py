@@ -1,36 +1,13 @@
 from http import HTTPStatus
 
-from django.test import Client, TestCase
-from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from notes.models import Note
+from .test_base_class import BaseTestCase
 
 User = get_user_model()
 
 
-class TestRoutes(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.author = User.objects.create(username='Лев Толстой')
-        cls.author_client = Client()
-        cls.author_client.force_login(cls.author)
-        cls.other_user = User.objects.create(username='Не автор')
-        cls.other_user_client = Client()
-        cls.other_user_client.force_login(cls.other_user)
-        cls.anonymous_client = cls.client_class()
-        cls.note = Note.objects.create(
-            title='Заголовок',
-            text='Текст',
-            author=cls.author
-        )
-        cls.NOTES_LIST_URL = reverse('notes:list')
-        cls.NOTES_ADD_URL = reverse('notes:add')
-        cls.NOTES_SUCCESS_URL = reverse('notes:success')
-        cls.LOGIN_URL = reverse('users:login')
-        cls.DETAIL_URL = reverse('notes:detail', args=(cls.note.slug,))
-        cls.EDIT_URL = reverse('notes:edit', args=(cls.note.slug,))
-        cls.DELETE_URL = reverse('notes:delete', args=(cls.note.slug,))
+class TestRoutes(BaseTestCase):
 
     def test_page_access(self):
         test_cases = [
