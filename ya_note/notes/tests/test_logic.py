@@ -50,7 +50,7 @@ class TestNoteCreation(BaseTestCase):
 class TestNoteEditDelete(BaseTestCase):
 
     def test_author_can_edit_own_note(self):
-        response = self.author_client.post(
+        self.author_client.post(
             self.EDIT_URL,
             data=self.form_data
         )
