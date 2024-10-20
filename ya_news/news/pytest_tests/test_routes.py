@@ -2,52 +2,52 @@ import pytest
 
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
+from pytest_lazyfixture import lazy_fixture
 
 from http import HTTPStatus
 
-NEWS_DETAIL_URL = 'news:detail'
-NEWS_EDIT_URL = 'news:edit'
-COMMENT_DELETE_URL = 'news:delete'
-USERS_LOGIN_URL = 'users:login'
-USERS_LOGOUT_URL = 'users:logout'
-USERS_SIGNUP_URL = 'users:signup'
-NEWS_HOME_URL = 'news:home'
+NEWS_DETAIL_URL = lazy_fixture('news_detail_url')
+NEWS_EDIT_URL = lazy_fixture('comment_edit_url')
+COMMENT_DELETE_URL = lazy_fixture('comment_delete_url')
+USERS_LOGIN_URL = reverse('users:login')
+USERS_LOGOUT_URL = reverse('users:logout')
+USERS_SIGNUP_URL = reverse('users:signup')
+NEWS_HOME_URL = lazy_fixture('news_home_url')
+ANONYMOUS_CLIENT = lazy_fixture('client')
+NOT_AUTHOR_CLIENT = lazy_fixture('not_author_client')
 pytestmark = pytest.mark.django_db
-lazy_fixture = pytest.lazy_fixture('pk_for_args')
 
 
-@pytestmark
-@pytest.mark.parametrize('name, args', ((
-    NEWS_EDIT_URL, lazy_fixture),
-    (COMMENT_DELETE_URL, lazy_fixture),),
+@pytest.mark.parametrize('name', ((
+    NEWS_EDIT_URL),
+    (COMMENT_DELETE_URL),),
 )
-def test_redirects(client, name, args):
-    login_url = reverse('users:login')
-    url = reverse(name, args=args)
+def test_redirects(client, name):
+    login_url = USERS_LOGIN_URL
+    url = name
     expected_url = f'{login_url}?next={url}'
     response = client.get(url)
     assertRedirects(response, expected_url)
 
 
 @pytest.mark.parametrize(
-    "client_fixture, url_name, args, expected_status",
+    "client_fixture, url_name, expected_status",
     [
-        ('client', NEWS_DETAIL_URL, lazy_fixture, HTTPStatus.OK),
-        ('not_author_client', NEWS_EDIT_URL, lazy_fixture,
+        (ANONYMOUS_CLIENT, NEWS_DETAIL_URL, HTTPStatus.OK),
+        (NOT_AUTHOR_CLIENT, NEWS_EDIT_URL,
          HTTPStatus.NOT_FOUND),
-        ('not_author_client', COMMENT_DELETE_URL, lazy_fixture,
+        (NOT_AUTHOR_CLIENT, COMMENT_DELETE_URL,
          HTTPStatus.NOT_FOUND),
-        ('client', USERS_LOGIN_URL, None, HTTPStatus.OK),
-        ('client', USERS_LOGOUT_URL, None, HTTPStatus.OK),
-        ('client', USERS_SIGNUP_URL, None, HTTPStatus.OK),
-        ('client', NEWS_HOME_URL, None, HTTPStatus.OK),
+        (ANONYMOUS_CLIENT, USERS_LOGIN_URL, HTTPStatus.OK),
+        (ANONYMOUS_CLIENT, USERS_LOGOUT_URL, HTTPStatus.OK),
+        (ANONYMOUS_CLIENT, USERS_SIGNUP_URL, HTTPStatus.OK),
+        (ANONYMOUS_CLIENT, NEWS_HOME_URL, HTTPStatus.OK),
     ]
 )
 def test_page_availability(
-    client_fixture, url_name, args, expected_status, request
+    client_fixture, url_name, expected_status
 ):
 
-    client = request.getfixturevalue(client_fixture)
-    url = reverse(url_name, args=args if args else ())
-    response = client.get(url)
+    url = url_name
+    response = client_fixture.get(url)
     assert response.status_code == expected_status

@@ -1,17 +1,14 @@
 # test_content.py
 import pytest
 from django.conf import settings
-from django.urls import reverse
 
 from news.forms import CommentForm
-
 
 pytestmark = pytest.mark.django_db
 
 
-@pytestmark
-def test_news_count(client, multiple_news):
-    url = reverse('news:home')
+def test_news_count(client, multiple_news, news_home_url):
+    url = news_home_url
     response = client.get(url)
     assert 'object_list' in response.context
     object_list = response.context['object_list']
@@ -19,9 +16,8 @@ def test_news_count(client, multiple_news):
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-@pytestmark
-def test_news_order(client, multiple_news):
-    url = reverse('news:home')
+def test_news_order(client, multiple_news, news_home_url):
+    url = news_home_url
     response = client.get(url)
     assert 'object_list' in response.context
     object_list = response.context['object_list']
@@ -30,9 +26,8 @@ def test_news_order(client, multiple_news):
     assert all_dates == sorted_dates
 
 
-@pytestmark
-def test_comments_order(client, multiple_comments, news):
-    url = reverse('news:detail', args=(news.id,))
+def test_comments_order(client, multiple_comments, news_detail_url):
+    url = news_detail_url
     response = client.get(url)
     assert 'news' in response.context
     news = response.context['news']
@@ -42,7 +37,6 @@ def test_comments_order(client, multiple_comments, news):
     assert all_timestamps == sorted_timestamps
 
 
-@pytestmark
 @pytest.mark.parametrize(
     'client_fixture, form_visible',
     (
@@ -50,8 +44,13 @@ def test_comments_order(client, multiple_comments, news):
         (pytest.lazy_fixture('author_client'), True),
     ),
 )
-def test_comment_form_visibility(client_fixture, form_visible, news):
-    url = reverse('news:detail', args=[news.id])
+def test_comment_form_visibility(
+    client_fixture,
+    form_visible,
+    news_detail_url
+):
+
+    url = news_detail_url
     response = client_fixture.get(url)
     form = response.context.get('form')
     assert isinstance(form, CommentForm) == form_visible

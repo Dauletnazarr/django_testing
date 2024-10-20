@@ -1,12 +1,11 @@
 import pytest
 
-from django.conf import settings
-
-from django.test.client import Client
-
-from django.utils import timezone
-
 from datetime import datetime, timedelta
+
+from django.conf import settings
+from django.test.client import Client
+from django.utils import timezone
+from django.urls import reverse
 
 from news.models import News, Comment
 from news.forms import BAD_WORDS
@@ -91,3 +90,38 @@ def form_data():
 @pytest.fixture
 def bad_words_data():
     return {'text': f'Какой-то текст {BAD_WORDS[0]}, еще текст'}
+
+
+@pytest.fixture
+def news_detail_url(news):
+    return reverse('news:detail', args=(news.id,))
+
+
+@pytest.fixture
+def comment_edit_url(comment):
+    return reverse('news:edit', args=(comment.id,))
+
+
+@pytest.fixture
+def comment_delete_url(comment):
+    return reverse('news:delete', args=(comment.id,))
+
+
+@pytest.fixture
+def users_login_url():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def users_logout_url():
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def users_signup_url():
+    return reverse('users:signup')
+
+
+@pytest.fixture
+def news_home_url():
+    return reverse('news:home')
